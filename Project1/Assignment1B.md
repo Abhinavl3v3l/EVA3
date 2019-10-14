@@ -59,3 +59,45 @@ Calculation :
 
 ---
 
+# No of Parameters in each Step
+
+| Step | Image          | Kernel         | Parameters                  |
+| ---- | -------------- | -------------- | --------------------------- |
+| 1    | (28 * 28) * 1  | (3 * 3) * 32   | (3 * 3) * 32 * 1 + 32 = 320 |
+| 2    | (26 * 26) * 32 | (3 * 3) * 64   | (3 * 3) * 64 * 32 + 64      |
+| 3    | (24 * 24) * 64 | (3 * 3 ) * 128 | (3 * 3) * 128 * 64 + 128    |
+
+---
+
+### Step 1
+
+| Step | Image         | Kernel       | Parameters                  |
+| ---- | ------------- | ------------ | --------------------------- |
+| 1    | (28 * 28) * 1 | (3 * 3) * 32 | (3 * 3) * 32 * 1 + 32 = 320 |
+
+1. 3 * 3 Kernel would have 9 parameters. 
+2. Image Kernels values for ONE channel is ONE. 
+3. There are 32 such kernels in Step 1. Hence 9 * 32 parameters.
+4. These 288 or 9 * 32  parameters would convolve over 1 channel of image.
+5. Adding 32 biases to this equation give **320** parameters to train.
+
+> Hence m * m * c * ic is the number of parameters at a particular step. Where m is size of kernel. c is number of kernel channels and ic are number of image kernels.
+
+---
+
+### Step 2
+
+| Step | Image          | Kernel         | Parameters                  |
+| ---- | -------------- | -------------- | --------------------------- |
+| 1    | (28 * 28) * 1  | (3 * 3) * 32   | (3 * 3) * 32 * 1 + 32 = 320 |
+| 2    | (26 * 26) * 32 | (3 * 3) * 64   | (3 * 3) * 64 * 32 + 64      |
+
+1. 3 * 3 Kernel would have 9 parameters. 
+2. Image Kernels values for ONE channel is ONE. 
+3. This kernel would convolve on all 32 channels.
+4. Hence a kernel would convolve 32 times.
+5. And there are 64 such kernels and 64 biases.
+6. Hence,  **(3 * 3) * 64 * 32 + 64** parameters to train. 
+
+---
+
