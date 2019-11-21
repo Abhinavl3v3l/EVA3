@@ -335,7 +335,7 @@ model.compile(loss='categorical_crossentropy', optimizer=Adam(lr=0.007), metrics
 
 ~~~
 
-Comparatively  a very good model. Was able to get base accuracy of 82.41%
+Comparatively  a very good model. Accuracy same as base. 
 
 ~~~
 Epoch 1/100
@@ -541,11 +541,11 @@ Epoch 100/100
 Model took 3226.68 seconds to train
 ~~~
 
-![](C:\Users\level\Documents\GitHub\EVA3\Images\Accuracy vs Loss.png)
+![](../Images/Accuracy vs Loss.png)
 
 
 
-
+A very good accuracy same as base line next to exceed the base line.
 
 
 
