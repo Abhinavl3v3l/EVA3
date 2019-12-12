@@ -59,13 +59,16 @@ ConvBN class contains an `__init__` function which initializes
 
 These layers are initialized and used in call function transforming to a ConvBN block
 
- ConvBN class contain a call function 
+ ConvBN class contain a **call** function 
 
 `tf.nn.relu(self.bn(self.drop(self.conv(inputs))))` 
 
 	1. Takes in Input  performs convolution followed by 
  	2. 5% pixel Dropout 
- 	3. Applying batch notmalization. 
+ 	3. Applying batch normalization.
+ 	4.  Activation Relu
+
+> A small Block with 2DConv, BN, DO and Activation
 
 
 
@@ -74,26 +77,32 @@ These layers are initialized and used in call function transforming to a ConvBN 
 ### ResBlk
 
 ~~~python
-class DavidNet(tf.keras.Model):
-  def __init__(self, c=64, weight=0.125):
+class ResBlk(tf.keras.Model):
+  def __init__(self, c_out, pool, res = False):
     super().__init__()
-    pool = tf.keras.layers.MaxPooling2D()
-    self.init_conv_bn = ConvBN(c)
-    self.blk1 = ResBlk(c*2, pool, res = True)
-    self.blk2 = ResBlk(c*4, pool)
-    self.blk3 = ResBlk(c*8, pool, res = True)
-    self.pool = tf.keras.layers.GlobalMaxPool2D()
-    self.linear = tf.keras.layers.Dense(10, kernel_initializer=init_pytorch, use_bias=False)
-    self.weight = weight
+    self.conv_bn = ConvBN(c_out)
+    self.pool = pool
+    self.res = res
+    if self.res:
+      self.res1 = ConvBN(c_out)
+      self.res2 = ConvBN(c_out)
 
-  def call(self, x, y):
-    h = self.pool(self.blk3(self.blk2(self.blk1(self.init_conv_bn(x)))))
-    h = self.linear(h) * self.weight
-    ce = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=h, labels=y)
-    loss = tf.reduce_sum(ce)
-    correct = tf.reduce_sum(tf.cast(tf.math.equal(tf.argmax(h, axis = 1), y), tf.float32))
-    return loss, correct
+  def call(self, inputs):
+    h = self.pool(self.conv_bn(inputs))
+    if self.res:
+      h = h + self.res2(self.res1(h))
+    return h
 ~~~
+
+If `res` argument is set to False its same as ConvBN with MAX pooling layer of size 2 added 
+
+If `res` argument is set to True. 2 more Conv BN blocks are added after Max pooling.
+
+A residual block. Yellow block is added after max pooling if `res` is set to TRUE.
+
+![r](r.png)
+
+
 
 ---
 
@@ -114,7 +123,7 @@ class DavidNet(tf.keras.Model):
 
   def call(self, x, y):
     h = self.pool(self.blk3(self.blk2(self.blk1(self.init_conv_bn(x)))))
-    h = self.linear(h) * self.weight
+    h = self.linear(h) * self.weight # Reasons Unknown
     ce = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=h, labels=y)
     loss = tf.reduce_sum(ce)
     correct = tf.reduce_sum(tf.cast(tf.math.equal(tf.argmax(h, axis = 1), y), tf.float32))
@@ -122,6 +131,15 @@ class DavidNet(tf.keras.Model):
 ~~~
 
 
+
+Finally, let’s build DavidNet itself, which contains
+
+1. A Conv-BN-Relu block
+2.  Three Residual blocks, two with residual components and one without.
+3. A global max pool,
+4. A fully connected layer that outputs logits.
+5. A mysterious “Multiply by 0.125” operation.
+6.  It outputs two values: cross-entropy loss and accuracy, in terms of the number of correct predictions in a batch. This sounds like a lot of things, but it’s actually not particularly hard to implement in Eager Keras:
 
 ---
 
@@ -143,15 +161,13 @@ x_train = normalize(pad4(x_train))
 x_test = normalize(x_test)
 ~~~
 
-
+Manual Image Normalization 
 
 
 
 ---
 
 ### Pre Model
-
-
 
 ~~~python
 model = DavidNet()
