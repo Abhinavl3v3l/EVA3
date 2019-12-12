@@ -4,9 +4,11 @@
 tf.enable_eager_execution()
 ~~~
 
-​	
+---
 
+### init_pytorch
 
+Initialization of kernel values 
 
 ~~~python
 def init_pytorch(shape, dtype=tf.float32, partition_info=None):
@@ -16,7 +18,20 @@ def init_pytorch(shape, dtype=tf.float32, partition_info=None):
 
 ~~~
 
+Output -  When shape is  [3,3].
 
+~~~txt
+tf.Tensor(
+[[-0.54611534  0.23626256 -0.48132807]
+ [ 0.28005707 -0.14628437 -0.38467693]
+ [-0.572527    0.3208421  -0.31219405]], shape=(3, 3), dtype=float32)
+~~~
+
+A random 3x3 Tensor is generated. 
+
+---
+
+### ConvBN
 
 ~~~python
 class ConvBN(tf.keras.Model):
@@ -29,4 +44,16 @@ class ConvBN(tf.keras.Model):
   def call(self, inputs):
     return tf.nn.relu(self.bn(self.drop(self.conv(inputs))))
 ~~~
+
+
+
+
+
+
+
+
+
+---
+
+### ResBlk
 
