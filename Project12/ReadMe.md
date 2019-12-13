@@ -229,3 +229,27 @@ for epoch in range(EPOCHS):
   print('epoch:', epoch+1, 'lr:', lr_schedule(epoch+1), 'train loss:', train_loss / len_train, 'train acc:', train_acc / len_train, 'val loss:', test_loss / len_test, 'val acc:', test_acc / len_test, 'time:', time.time() - t)
 ~~~
 
+- Record Time
+- Slice test set (BatchSize)
+- map(dataaug) applied to training set.
+
+This loop is the most important loop 
+
+~~~python
+for (x, y) in tqdm(train_set):
+    with tf.GradientTape() as tape:
+      loss, correct = model(x, y)
+
+    var = model.trainable_variables
+    grads = tape.gradient(loss, var)
+    for g, v in zip(grads, var):
+      g += v * WEIGHT_DECAY * BATCH_SIZE
+    opt.apply_gradients(zip(grads, var), global_step=global_step)
+
+    train_loss += loss.numpy()
+    train_acc += correct.numpy()
+~~~
+
+It takes in training set and uses gradient Tape to keep track to gradient computation and train  gradient wrt to `loss` as done here `grads = tape.gradient(loss, var)`. 
+
+Gradient are then update and changes are made and the model is run for one batch `opt.apply_gradients(zip(grads, var), global_step=global_step)`
