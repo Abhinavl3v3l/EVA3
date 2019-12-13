@@ -161,7 +161,11 @@ x_train = normalize(pad4(x_train))
 x_test = normalize(x_test)
 ~~~
 
-Manual Image Normalization 
+- Data Set Splitting
+
+- Convert to type 64 bit int  
+
+- Calculate mean and std for Manual Image Normalization and padding. 
 
 
 
@@ -178,13 +182,17 @@ global_step = tf.train.get_or_create_global_step()
 lr_func = lambda: lr_schedule(global_step/batches_per_epoch)/BATCH_SIZE
 opt = tf.train.MomentumOptimizer(lr_func, momentum=MOMENTUM, use_nesterov=True)
 data_aug = lambda x, y: (tf.image.random_flip_left_right(tf.random_crop(x, [32, 32, 3])), y)
+
+import matplotlib.pyplot as plt
+plt.plot([0, (EPOCHS+1)//5, EPOCHS], [0, LEARNING_RATE, 0], 'o')
 ~~~
 
+- Learning Rate Scheduler   function, creating a cyclic scheduler as shown below.
 
+![cyclic](cyclic.png)
 
-
-
-
+- Momentum Scheduler (using TF's Nesterov Momentum)
+- Data Aug - Mirror Images created horizontal , adding to dataset as vertical flit will create useless data.
 
 ---
 
