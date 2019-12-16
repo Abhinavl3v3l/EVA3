@@ -26,6 +26,7 @@ class ConvBN(tf.keras.Model):
     self.bn = tf.keras.layers.BatchNormalization(momentum=0.9, epsilon=1e-5)
     self.drop = tf.keras.layers.Dropout(0.05)
 
+    
   def call(self, inputs):
     return tf.nn.relu(self.bn(self.drop(self.conv(inputs))))
 ~~~
